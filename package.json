@@ -1,0 +1,14 @@
+{
+  "name": "mr-interviewer",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "install:all": "npm install --prefix client && npm install --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "dev": "concurrently -n CLIENT,SERVER -c blue,green \"npm:dev:client\" \"npm:dev:server\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

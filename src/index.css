@@ -1,0 +1,59 @@
+:root {
+  /* Dark neon color palette */
+  --ink: #e8f4ff;
+  --ink-soft: #9bb7d7;
+  --paper: #070b16;
+  --paper-raised: rgba(15, 22, 41, 0.95);
+  --line: rgba(99, 149, 255, 0.16);
+  --brass: #64e5ff;
+  --brass-dark: #3da9d8;
+  --good: #7ef7b7;
+  --needs-work: #ff6ccd;
+  --muted: #7a8db7;
+
+  --font-display: "Fraunces", serif;
+  --font-body: "Source Sans 3", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --radius: 14px;
+  --shadow-card: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
