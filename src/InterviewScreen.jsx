@@ -29,11 +29,29 @@ export default function InterviewScreen({
 }) {
   const [draft, setDraft] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [textareaHeight, setTextareaHeight] = useState(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) return 120;
+    return 300;
+  });
   const scrollRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  const DEFAULT_TEXTAREA_HEIGHT = typeof window !== "undefined" && window.innerWidth < 768 ? 120 : 300;
+  const MAX_TEXTAREA_HEIGHT = typeof window !== "undefined" && window.innerWidth < 768 ? 280 : 500;
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    textarea.style.height = "auto";
+    const nextHeight = Math.min(Math.max(textarea.scrollHeight, DEFAULT_TEXTAREA_HEIGHT), MAX_TEXTAREA_HEIGHT);
+
+    setTextareaHeight((currentHeight) => (nextHeight > currentHeight ? nextHeight : currentHeight));
+  }, [draft, DEFAULT_TEXTAREA_HEIGHT, MAX_TEXTAREA_HEIGHT]);
 
   const scoredMessages = useMemo(
     () => messages.filter((m) => typeof m.score === "number"),
@@ -58,6 +76,26 @@ export default function InterviewScreen({
       e.preventDefault();
       handleSubmit(e);
     }
+  }
+
+  function handleResizeStart(e) {
+    e.preventDefault();
+    const startY = e.clientY;
+    const startHeight = textareaHeight;
+
+    function onMove(moveEvent) {
+      const deltaY = moveEvent.clientY - startY;
+      const nextHeight = Math.max(120, Math.min(500, startHeight + deltaY));
+      setTextareaHeight(nextHeight);
+    }
+
+    function onUp() {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    }
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
   }
 
   const currentQ = Math.min(meta.questionNumber, meta.totalQuestions);
@@ -243,14 +281,19 @@ export default function InterviewScreen({
 
         {!done ? (
           <form className="answer-form" onSubmit={handleSubmit}>
-            <textarea
-              placeholder="Type your answer… (Enter to send, Shift+Enter for new line)"
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={handleKeyDown}
-              disabled={submitting}
-              rows={3}
-            />
+            <div className="textarea-shell">
+              <div className="textarea-resizer" onMouseDown={handleResizeStart} />
+              <textarea
+                ref={textareaRef}
+                placeholder="Type your answer… (Enter to send, Shift+Enter for new line)"
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={submitting}
+                rows={3}
+                style={{ height: `${textareaHeight}px` }}
+              />
+            </div>
             <button type="submit" className="primary-btn" disabled={submitting || !draft.trim()}>
               Send
             </button>
